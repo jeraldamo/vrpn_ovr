@@ -79,6 +79,7 @@
 #include "vrpn_Tracker_MotionNode.h"
 #include "vrpn_Tracker_NDI_Polaris.h"   // for vrpn_Tracker_NDI_Polaris
 #include "vrpn_Tracker_NovintFalcon.h"
+#include "vrpn_Tracker_OculusRift.h"    // for vrpn_Tracker_OculusRift
 #include "vrpn_Tracker_PDI.h"
 #include "vrpn_Tracker_PhaseSpace.h"
 #include "vrpn_Tracker_RazerHydra.h"    // for vrpn_Tracker_RazerHydra
@@ -3915,6 +3916,26 @@ int vrpn_Generic_Server_Object::setup_Tracker_LibertyPDI(char * &pch, char * lin
 #endif
 }
 
+int vrpn_Generic_Server_Object::setup_Tracker_OculusRift(char * &pch, char * line, FILE * /*config_file*/) {
+  char name [LINESIZE];
+
+  VRPN_CONFIG_NEXT();
+  if (sscanf (pch, "%511s", name) != 1) {
+    fprintf (stderr, "Bad line: %s\n", line);
+    return -1;
+  }
+  //vrpn_Tracker_OculusRift* device = new vrpn_Tracker_OculusRift(name, connection);
+  //if (device == NULL) {
+  //  fprintf (stderr, "Can't create new device from line %s\n", line);
+  //  return -1;
+  //}
+  if (verbose) { printf("Opening %s\n", line); }
+  //_devices->add(device);
+  _devices->add(new vrpn_Tracker_OculusRift(name, connection));
+
+  return 0;  // successful completion
+}
+
 #undef VRPN_CONFIG_NEXT
 
 vrpn_Generic_Server_Object::vrpn_Generic_Server_Object (vrpn_Connection *connection_to_use, const char *config_file_name, int port, bool be_verbose, bool bail_on_open_error)
@@ -4235,6 +4256,8 @@ vrpn_Generic_Server_Object::vrpn_Generic_Server_Object (vrpn_Connection *connect
         VRPN_CHECK (setup_Tracker_FastrakPDI);
       } else if (VRPN_ISIT ("vrpn_Tracker_JsonNet")) {
         VRPN_CHECK (setup_Tracker_JsonNet);
+      } else if (VRPN_ISIT ("vrpn_Tracker_OculusRift")) {
+        VRPN_CHECK (setup_Tracker_OculusRift);
       } else {	// Never heard of it
         sscanf (line, "%511s", s1);	// Find out the class name
         fprintf (stderr, "vrpn_server: Unknown Device: %s\n", s1);

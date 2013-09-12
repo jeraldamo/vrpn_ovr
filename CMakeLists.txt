@@ -725,6 +725,38 @@ if(VRPN_INCLUDE_PHASESPACE)
 endif()
 
 ###
+# Oculus VR API
+###
+option(VRPN_INCLUDE_OVR
+	"Build with Oculus VR library support"
+	ON)
+set(OVR_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/LibOVR/Include/" CACHE PATH "location of OVR headers")
+set(OVR_LIBRARY_DIR "${CMAKE_SOURCE_DIR}/LibOVR/Lib/Linux/Release/x86_64/" CACHE PATH "location of OVR libraries")
+if(VRPN_INCLUDE_OVR)
+	include_directories(${OVR_INCLUDE_DIR})
+	link_directories(${OVR_LIBRARY_DIR})
+	list(APPEND SERVER_EXTRA_LIBS ovr)
+	#find_package(UDev)
+	#if(UDEV_FOUND)
+	    set(UDEV_INCLUDE_DIR "/lib/udev/" CACHE PATH "location of udev headers")
+	    set(UDEV_LIBRARIES "/home/volq/48/thoma891/" CACHE PATH "location of udev so")
+	    include_directories(${UDEV_INCLUDE_DIR})
+	    link_directories(${UDEV_LIBRARIES})
+	    list(APPEND SERVER_EXTRA_LIBS udev)
+	    
+	    set(XLIB_INCLUDE_DIR "/usr/include/X11/" CACHE PATH "location of X11 headers")
+	    include_directories(${XLIB_INCLUDE_DIR})
+	    
+	    set(XINERAMA_INCLUDE_DIR "/usr/include/X11/extensions" CACHE PATH "location of Xinerama headers")
+	    set(XINERAMA_LIBRARY_DIR "/lib/x86_64-linux-gnu/" CACHE PATH "location of Xinerama so")
+        include_directories(${XINERAMA_INCLUDE_DIR})
+	    link_directories(${XINERAMA_LIBRARY_DIR})
+	    list(APPEND SERVER_EXTRA_LIBS Xinerama)
+	    
+	#endif()
+endif()
+
+###
 # XXX Other libraries needing detection and handling (TODO)
 ###
 # InterSense Interface Libraries SDK
@@ -973,6 +1005,7 @@ set(VRPN_SERVER_SOURCES
 	vrpn_Tracker_MotionNode.C
 	vrpn_Tracker_NDI_Polaris.C
 	vrpn_Tracker_NovintFalcon.C
+	vrpn_Tracker_OculusRift.C
 	vrpn_Tracker_PhaseSpace.C
 	vrpn_Tracker_RazerHydra.C
 	vrpn_Tracker_SpacePoint.C
@@ -1070,6 +1103,7 @@ set(VRPN_SERVER_PUBLIC_HEADERS
 	vrpn_Tracker_MotionNode.h
 	vrpn_Tracker_NDI_Polaris.h
 	vrpn_Tracker_NovintFalcon.h
+	vrpn_Tracker_OculusRift.h
 	vrpn_Tracker_PhaseSpace.h
 	vrpn_Tracker_RazerHydra.h
 	vrpn_Tracker_SpacePoint.h
