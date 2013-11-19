@@ -730,8 +730,8 @@ endif()
 option(VRPN_INCLUDE_OVR
 	"Build with Oculus VR library support"
 	ON)
-set(OVR_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/LibOVR/Include/" CACHE PATH "location of OVR headers")
-set(OVR_LIBRARY_DIR "${CMAKE_SOURCE_DIR}/LibOVR/Lib/Linux/Release/x86_64/" CACHE PATH "location of OVR libraries")
+set(OVR_INCLUDE_DIR "$/home/volq/48/thoma891/Projects/OculusSDK/LibOVR/Include/" CACHE PATH "location of OVR headers")
+set(OVR_LIBRARY_DIR "$/home/volq/48/thoma891/Projects/OculusSDK/LibOVR/Lib/Linux/Release/x86_64/" CACHE PATH "location of OVR libraries")
 if(VRPN_INCLUDE_OVR)
 	include_directories(${OVR_INCLUDE_DIR})
 	link_directories(${OVR_LIBRARY_DIR})

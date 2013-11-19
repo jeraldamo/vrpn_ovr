@@ -28,9 +28,14 @@
 #include "OVR.h"
 
 // Standard includes
-// - none
+#include <iostream>
 
-class VRPN_API vrpn_Tracker_OculusRift: public vrpn_Tracker {
+using namespace OVR;
+using namespace std;
+
+
+class VRPN_API vrpn_Tracker_OculusRift: public vrpn_Tracker 
+{
 	public:
 		vrpn_Tracker_OculusRift(const char * name, vrpn_Connection * trackercon);
 		~vrpn_Tracker_OculusRift();
@@ -56,10 +61,9 @@ class VRPN_API vrpn_Tracker_OculusRift: public vrpn_Tracker {
 
 		q_vec_type _old_position[1];
 		
-		OVR::DeviceManager* riftManager;
-		OVR::HMDDevice* riftHMD;
-		OVR::SensorDevice* riftSensor;
-		OVR::SensorFusion riftSFusion;
+		Ptr<DeviceManager> pRiftManager;
+		Ptr<SensorDevice> pRiftSensor;
+		SensorFusion pRiftSFusion;
 		
 
 };

@@ -32,12 +32,11 @@
 #include <stdio.h>                      // for fprintf, NULL, stderr
 #include <string.h>                     // for memset
 
-using namespace OVR;
-
 vrpn_Tracker_OculusRift::vrpn_Tracker_OculusRift(const char * name, vrpn_Connection * con)
 	: vrpn_Tracker(name, con)
 	, status(RIFT_WAITING_FOR_CONNECT)
 {
+	
 	
 	vrpn_Tracker::num_sensors = 1;
 
@@ -51,37 +50,33 @@ vrpn_Tracker_OculusRift::vrpn_Tracker_OculusRift(const char * name, vrpn_Connect
 	
 	// Initialize LibOVR Core
 	status = RIFT_INITIALIZING_CORE;
-	System::Init(Log::ConfigureDefaultLog(LogMask_All));
-	fprintf(stderr, "Got Here\n");
+	System::Init();
+    
 	status = RIFT_INITIALIZING_HMD;
-	fprintf(stderr, "Got Here\n");
-	riftManager = riftManager->Create();
-	fprintf(stderr, "Got Here\n");
-	riftHMD = riftManager->EnumerateDevices<HMDDevice>().CreateDevice();
-	fprintf(stderr, "Got Here\n");
-	riftSensor = riftHMD->GetSensor();
-	fprintf(stderr, "Got Here\n");
-	if (riftSensor)
+	pRiftManager = *DeviceManager::Create();
+	
+	// No need to create HMD device, go straight to creating sensor device
+	pRiftSensor = *pRiftManager->EnumerateDevices<SensorDevice>().CreateDevice();
+	if (pRiftSensor)
 	{
-		riftSFusion.AttachToSensor(riftSensor);
-		_set_reporting();
+	    fprintf(stderr, "Located Rift Sensor\n");
+	    pRiftSFusion.AttachToSensor(pRiftSensor);
 	}
-	else
-	{
-		fprintf(stderr, "vrpn_Tracker_OculusRift::Failed to initialze riftSensor\n");
-	}
+    
+    usleep(1000 * 1000 * 10);
+    
+    fprintf(stderr, "Ready to accept requests...\n");
+
+    _set_reporting();
 
 }
 
 vrpn_Tracker_OculusRift::~vrpn_Tracker_OculusRift() 
 {	
-    riftManager = NULL;
-    delete riftManager;
-    riftHMD = NULL;
-	delete riftHMD;
-	riftSensor = NULL;
-	delete riftSensor;
-	
+	pRiftSensor.Clear();
+	pRiftManager.Clear();
+	//pRiftSFusion = 0;
+	//delete pRiftSFusion;
 	System::Destroy();
 }
 
@@ -95,6 +90,7 @@ void vrpn_Tracker_OculusRift::mainloop()
 {
 	// server update
 	vrpn_Tracker::server_mainloop();
+	
 	
 	// update report
 	if (status == RIFT_REPORTING)
@@ -119,19 +115,20 @@ void vrpn_Tracker_OculusRift::_generate_report(int sensorNum)
 
 	d_sensor = sensorNum;
     
-    // Get orientation
-    Quatf riftQuat = riftSFusion.GetOrientation();
-    
     // Keep position set to 0, position may be added later by Oculus.
 	pos[0] = 0;
 	pos[1] = 0;
 	pos[2] = 0;
 
     // Set d_quat
-	d_quat[Q_W] = riftQuat.w;
-	d_quat[Q_X] = riftQuat.x;
-	d_quat[Q_Y] = riftQuat.y;
-	d_quat[Q_Z] = riftQuat.z;
+    //fprintf(stderr, "Got here\n");
+    Quatf tmpOrientation = pRiftSFusion.GetOrientation();
+    //fprintf(stderr, "Got here too\n");
+    
+	d_quat[Q_W] = tmpOrientation.w;
+	d_quat[Q_X] = tmpOrientation.x;
+	d_quat[Q_Y] = tmpOrientation.y;
+	d_quat[Q_Z] = tmpOrientation.z;
 	q_normalize(d_quat, d_quat);
 
     // Replace old positon with current position
